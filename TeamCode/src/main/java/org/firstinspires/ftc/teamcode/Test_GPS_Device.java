@@ -27,10 +27,10 @@ public class Test_GPS_Device extends LinearOpMode {
                 telemetry.addData("Elevation", GPS.El);
                 telemetry.addData("Rotation", GPS.Rot);
 
-                telemetry.addData("Buffer Raw Data", "");
-                for (int i = 0; i < GPS.gps_Buffer.length; i++) {
-                    telemetry.addData("     Byte " + i, GPS.gps_Buffer[i]);
-                }
+//                telemetry.addData("Buffer Raw Data", "");
+//                for (int i = 0; i < GPS.gps_Buffer.length; i++) {
+//                    telemetry.addData("     Byte " + i, GPS.gps_Buffer[i]);
+//                }
             }
             else{
                 telemetry.addData("Vex GPS Sensor is disconnected","");

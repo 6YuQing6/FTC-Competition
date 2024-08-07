@@ -4,24 +4,19 @@ import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
-
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 import com.hoho.android.usbserial.driver.ProbeTable;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
-
-
-
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-
 import java.io.IOException;
 import java.util.HashMap;
 
 public class VEX_GPS_Sensor {
     public boolean isConnected = false;
-    private boolean usbConnected;
+    private boolean usbConnected = false;
     int gps_vId = 10376;
     int gps_pId = 1313;
     int gps_baudrate = 115200;
@@ -35,6 +30,7 @@ public class VEX_GPS_Sensor {
     public int Status;
     public double X = 0;
     public double Y = 0;
+    public double Z = 0;
     public double Az = 0;
     public double El = 0;
     public double Rot = 0;
@@ -103,18 +99,34 @@ public class VEX_GPS_Sensor {
     public void getData() {
         try {
             gps_Port.read(gps_Buffer, 16, 10);
+
         } catch (IOException e) {
             throw new RuntimeException("GPS cant read data from virtual Com", e);
         }
         if (gps_Port.isOpen()) {
+            short Xi = Short.parseShort(gps_Buffer[3]+"");
+            short Xd = Short.parseShort(gps_Buffer[2]+"");
+            short Yi = Short.parseShort(gps_Buffer[5]+"");
+            short Yd = Short.parseShort(gps_Buffer[4]+"");
+            short Zi = Short.parseShort(gps_Buffer[7]+"");
+            short Zd = Short.parseShort(gps_Buffer[6]+"");
+            short Azi = Short.parseShort(gps_Buffer[9]+"");
+            short Azd = Short.parseShort(gps_Buffer[8]+"");
+            short Eli = Short.parseShort(gps_Buffer[11]+"");
+            short Eld = Short.parseShort(gps_Buffer[10]+"");
+            short Roti = Short.parseShort(gps_Buffer[13]+"");
+            short Rotd = Short.parseShort(gps_Buffer[12]+"");
+
+
             Status = gps_Buffer[1];
-            X = Float.parseFloat(gps_Buffer[2] + "." + gps_Buffer[3]);
-            Y = Float.parseFloat(gps_Buffer[4] + "." + gps_Buffer[5]);
-            Az = Float.parseFloat(gps_Buffer[8] + "." + gps_Buffer[9]);
-            El = Float.parseFloat(gps_Buffer[10] + "." + gps_Buffer[11]);
-            Rot = Float.parseFloat(gps_Buffer[12] + "." + gps_Buffer[13]);
+            X = Float.parseFloat(Xi + "." + Math.abs(Xd));
+            Y = Float.parseFloat(Yi + "." + Math.abs(Yd));
+            Z = Float.parseFloat(Zi + "." + Math.abs(Zd));
+            Az = Float.parseFloat(Azi + "." + Math.abs(Azd));
+            El = Float.parseFloat(Eli + "." + Math.abs(Eld));
+            Rot = Float.parseFloat(Roti + "." + Math.abs(Rotd));
             if (Status == 20) {
-                X = X * 1000;
+                X = X / 1000;
                 Y = Y * 1000;
                 Az = ((Az / 32768.0 * 180.0) - Angle_Offset) % 360;
                 El = (El / 32768.0 * 180.0);
